@@ -10,6 +10,7 @@ import hpp from "hpp";
 import compression from "compression";
 
 import { router as userRouter } from "./routes/userRoutes.js";
+import { router as postRouter } from "./routes/postRoutes.js";
 import { globalErrorHandler } from "./controllers/errorController.js";
 import AppError from "./utils/appError.js";
 
@@ -79,11 +80,13 @@ app.use(xssSanitization);
 //Test middleware
 app.use((req, res, next) => {
   req.requestTime = new Date().toISOString();
+
   next();
 });
 
 // Routes
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/posts", postRouter);
 
 // Catch-all for undefined routes
 app.all(/.*/, (req, res, next) => {

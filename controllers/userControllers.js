@@ -24,7 +24,7 @@ export const getAllUsers = catchAsync(async (req, res, next) => {
 });
 
 export const getOneUser = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.params.id).populate("postsVirtual");
 
   res.status(200).json({
     status: "success",
