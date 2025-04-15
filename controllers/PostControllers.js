@@ -2,7 +2,7 @@ import Post from "../models/postModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
 
-const currentLoggedInUser = async (req, next) => {
+export const currentLoggedinUser = async (req, next) => {
   const post = await Post.findById(req.params.id);
   if (!post) return next(new AppError("Post not found", 404));
 
@@ -11,7 +11,6 @@ const currentLoggedInUser = async (req, next) => {
 
   return post;
 };
-
 export const getAllPosts = catchAsync(async (req, res, next) => {
   const posts = await Post.find();
 
@@ -51,7 +50,7 @@ export const createPost = catchAsync(async (req, res, next) => {
 });
 
 export const updatePost = catchAsync(async (req, res, next) => {
-  await currentLoggedInUser(req, next);
+  await currentLoggedinUser(req, next);
 
   const updatedPost = await Post.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -71,7 +70,7 @@ export const updatePost = catchAsync(async (req, res, next) => {
 });
 
 export const deletePost = catchAsync(async (req, res, next) => {
-  await currentLoggedInUser(req, next);
+  await currentLoggedinUser(req, next);
   await Post.findByIdAndDelete(req.params.id);
   res.status(204).json({
     status: "success",

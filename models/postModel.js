@@ -22,9 +22,18 @@ const postSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    comments: [],
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_, ret) => {
+        delete ret.id;
+        return ret;
+      },
+    },
+    toObject: { virtuals: true },
+  }
 );
 
 postSchema.pre(/^find/, function (next) {
@@ -35,5 +44,10 @@ postSchema.pre(/^find/, function (next) {
   next();
 });
 
+postSchema.virtual("commentsVirtual", {
+  ref: "Comment",
+  foreignField: "post",
+  localField: "_id",
+});
 const Post = mongoose.model("Post", postSchema);
 export default Post;
