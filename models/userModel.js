@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import validator from "validator";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema(
   {
@@ -7,16 +8,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "User name is required!"],
     },
-    userName: {
-      type: String,
-      required: true,
-      unique: true,
-      trim: true,
-      minlength: 3,
-      maxlength: 20,
-      lowercase: true,
-      match: /^[a-z0-9_]+$/,
-    },
+
     email: {
       type: String,
       unique: true,
@@ -30,7 +22,7 @@ const userSchema = new mongoose.Schema(
       minlength: [8, "Password must contain min 8 characters"],
       select: false,
     },
-    confirmPassword: {
+    passwordConfirm: {
       type: String,
       required: [true, "Please confirm your password!"],
       validate: {
@@ -46,12 +38,11 @@ const userSchema = new mongoose.Schema(
     },
     bio: {
       type: String,
-      default: "",
       maxlength: 80,
+      default: "",
     },
     followers: [],
     following: [],
-    isLiked: [],
     posts: [],
     role: {
       type: String,
@@ -63,9 +54,43 @@ const userSchema = new mongoose.Schema(
       default: true,
       select: false,
     },
+    passwordChangedAt: Date,
   },
   { timestamps: true }
 );
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+
+  this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: true });
+  next();
+});
+
+userSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
+};
 
 const User = mongoose.model("User", userSchema);
 export default User;
