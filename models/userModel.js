@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema(
     },
     followers: [],
     following: [],
-    posts: [],
+
     role: {
       type: String,
       enum: ["admin", "user"],
@@ -56,7 +56,17 @@ const userSchema = new mongoose.Schema(
     },
     passwordChangedAt: Date,
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: (_, ret) => {
+        delete ret.id;
+        return ret;
+      },
+    },
+    toObject: { virtuals: true },
+  }
 );
 
 userSchema.pre("save", async function (next) {
@@ -71,6 +81,12 @@ userSchema.pre("save", async function (next) {
 userSchema.pre(/^find/, function (next) {
   this.find({ active: true });
   next();
+});
+
+userSchema.virtual("postsVirtual", {
+  ref: "Post",
+  foreignField: "user",
+  localField: "_id",
 });
 
 userSchema.methods.correctPassword = async function (
