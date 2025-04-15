@@ -23,6 +23,17 @@ export const getAllUsers = catchAsync(async (req, res, next) => {
   });
 });
 
+export const getOneUser = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user,
+    },
+  });
+});
+
 export const updateMe = catchAsync(async (req, res, next) => {
   if (req.body.password || req.body.passwordConfirm) {
     return next(new AppError("This route is not for password updates.", 400));
@@ -51,3 +62,8 @@ export const deleteMe = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+export const getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+  next();
+};

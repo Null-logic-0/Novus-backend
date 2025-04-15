@@ -9,6 +9,8 @@ import {
 import {
   deleteMe,
   getAllUsers,
+  getMe,
+  getOneUser,
   updateMe,
 } from "../controllers/userControllers.js";
 
@@ -19,8 +21,10 @@ router.post("/login", login);
 
 router.use(protect);
 
+router.get("/me", getMe, getOneUser);
 router.patch("/updateMyPassword", updatePassword);
 router.patch("/updateMe", updateMe);
 router.delete("/deleteMe", deleteMe);
 
 router.route("/").get(getAllUsers);
+router.route("/:id").get(getOneUser);

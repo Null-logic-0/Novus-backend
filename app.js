@@ -2,7 +2,8 @@ import express from "express";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
-import ExpressMongoSanitize from "express-mongo-sanitize";
+import mongoSanitize from "express-mongo-sanitize";
+
 import xss from "xss";
 import cors from "cors";
 import hpp from "hpp";
@@ -39,8 +40,12 @@ app.use("/api", limiter);
 app.use(express.json({ limit: "10kb" }));
 
 // Data sanitization againt NOSQL query injection
-app.use(ExpressMongoSanitize());
-
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body);
+  if (req.params) mongoSanitize.sanitize(req.params);
+  // Skip req.query to avoid the mutation error
+  next();
+});
 // Data sanitization against xxs
 const xssSanitization = (req, res, next) => {
   if (req.body) {
