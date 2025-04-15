@@ -1,5 +1,92 @@
 import express from "express";
+import morgan from "morgan";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import ExpressMongoSanitize from "express-mongo-sanitize";
+import xss from "xss";
+import cors from "cors";
+import hpp from "hpp";
+import compression from "compression";
+
+import { router as userRouter } from "./routes/userRoutes.js";
+import { globalErrorHandler } from "./controllers/errorController.js";
+import AppError from "./utils/appError.js";
+
+import dotenv from "dotenv";
+dotenv.config({ path: "./config.env" });
 
 const app = express();
+
+//Set security HTTP headers
+app.use(cors());
+app.use(helmet());
+
+// Development logging
+if (process.env.NODE_ENV === "development") {
+  app.use(morgan("dev"));
+}
+
+// Limit requests from same API
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "Too many requests from this IP,please try again in an hour",
+});
+
+app.use("/api", limiter);
+
+// Body parsing middleware
+app.use(express.json({ limit: "10kb" }));
+
+// Data sanitization againt NOSQL query injection
+app.use(ExpressMongoSanitize());
+
+// Data sanitization against xxs
+const xssSanitization = (req, res, next) => {
+  if (req.body) {
+    Object.keys(req.body).forEach((key) => {
+      req.body[key] = xss(req.body[key]);
+    });
+  }
+  if (req.query) {
+    Object.keys(req.query).forEach((key) => {
+      req.query[key] = xss(req.query[key]);
+    });
+  }
+  if (req.params) {
+    Object.keys(req.params).forEach((key) => {
+      req.params[key] = xss(req.params[key]);
+    });
+  }
+  next();
+};
+
+app.use(compression());
+app.use(xssSanitization);
+
+//Prevent parameter polltion
+// app.use(hpp({
+//     whitelist:[
+//         //...
+//     ]
+// }));
+
+//Test middleware
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
+});
+
+// Routes
+app.use("/api/v1/users", userRouter);
+
+// Catch-all for undefined routes
+app.all(/.*/, (req, res, next) => {
+  console.log(`Cannot find ${req.originalUrl} on this server!`);
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
+
+// Global error handler
+app.use(globalErrorHandler);
 
 export default app;
