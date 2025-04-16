@@ -4,6 +4,7 @@ import {
   createPost,
   deletePost,
   getAllPosts,
+  getLikedPosts,
   getSinglePost,
   togglePostLike,
   updatePost,
@@ -23,6 +24,10 @@ router.use(protect);
 
 // Posts
 router.route("/").get(getAllPosts).post(createPost);
+
+// Liked-posts
+router.get("/liked-posts", getLikedPosts);
+
 router.route("/:id").get(getSinglePost).patch(updatePost).delete(deletePost);
 
 // Comments

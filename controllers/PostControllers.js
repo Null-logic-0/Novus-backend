@@ -81,3 +81,24 @@ export const deletePost = catchAsync(async (req, res, next) => {
 
 // Post like
 export const togglePostLike = toggleLike(Post);
+
+export const getLikedPosts = catchAsync(async (req, res, next) => {
+  const currentUserId = req.user.id;
+
+  const likedPosts = await Post.find({ likes: currentUserId }).populate({
+    path: "user",
+    select: "fullName profileImage",
+  });
+
+  if (!likedPosts) {
+    return next(new AppError("No liked posts found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: likedPosts.length,
+    data: {
+      likedPosts,
+    },
+  });
+});
