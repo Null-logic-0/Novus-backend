@@ -1,6 +1,7 @@
 import Post from "../models/postModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
+import { toggleLike } from "../utils/toggleLike.js";
 
 export const currentLoggedinUser = async (req, next) => {
   const post = await Post.findById(req.params.id);
@@ -77,3 +78,6 @@ export const deletePost = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+// Post like
+export const togglePostLike = toggleLike(Post);

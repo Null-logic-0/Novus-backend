@@ -5,6 +5,7 @@ import {
   deletePost,
   getAllPosts,
   getSinglePost,
+  togglePostLike,
   updatePost,
 } from "../controllers/PostControllers.js";
 import {
@@ -12,6 +13,7 @@ import {
   createComment,
   deleteComment,
   getPostComments,
+  toggleLikeComment,
   updateComment,
 } from "../controllers/commentControllers.js";
 
@@ -29,3 +31,9 @@ router.route("/:id/comments").get(getPostComments).post(createComment);
 // Comment reply nested route
 router.route("/:id/comments/:parentCommentId/replies").post(commentReply);
 router.route("/comments/:id").patch(updateComment).delete(deleteComment);
+
+// Post like
+router.route("/:id/like").patch(togglePostLike);
+
+// Comment like
+router.route("/comments/:id/like").patch(toggleLikeComment);
