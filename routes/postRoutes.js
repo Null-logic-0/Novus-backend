@@ -21,7 +21,6 @@ import {
 export const router = Router();
 
 router.use(protect);
-
 // Posts
 router.route("/").get(getAllPosts).post(createPost);
 

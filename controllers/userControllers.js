@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
+import { isBlocked } from "../utils/isBlocked.js";
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -12,21 +13,38 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 export const getAllUsers = catchAsync(async (req, res, next) => {
+  const currentUser = await User.findById(req.user.id).select("blockedUsers");
+
   const users = await User.find().populate("postsVirtual");
+
+  const visibleUsers = users.filter(
+    (user) => !isBlocked(currentUser, user._id)
+  );
+
   res.status(200).json({
     status: "success",
     results: users.length,
     data: {
-      users,
+      users: visibleUsers,
     },
   });
 });
 
 export const getOneUser = catchAsync(async (req, res, next) => {
+  const currentUser = await User.findById(req.user.id).select("blockedUsers");
+
   const user = await User.findById(req.params.id)
     .populate("followers", "fullName profileImage")
     .populate("following", "fullName profileImage")
     .populate("postsVirtual");
+
+  if (!user) {
+    return next(new AppError("User not found", 404));
+  }
+
+  if (isBlocked(currentUser, user._id)) {
+    return next(new AppError("You cannot view this user's profile"));
+  }
 
   res.status(200).json({
     status: "success",
@@ -187,6 +205,55 @@ export const searchConnections = catchAsync(async (req, res, next) => {
     results: users.length,
     data: {
       users,
+    },
+  });
+});
+
+// Block user
+export const toggleBlockUser = catchAsync(async (req, res, next) => {
+  const currentUserId = req.user.id;
+  const targetUserId = req.params.id;
+
+  if (currentUserId === targetUserId) {
+    return next(new AppError("You can't block yourself!", 400));
+  }
+
+  const currentUser = await User.findById(currentUserId);
+  const isBlocked = currentUser.blockedUsers.includes(targetUserId);
+
+  if (isBlocked) {
+    currentUser.blockedUsers.pull(targetUserId);
+  } else {
+    currentUser.blockedUsers.push(targetUserId);
+
+    // auto-unfollow each-other when blocked
+
+    currentUser.following.pull(targetUserId);
+    const targetUser = await User.findById(targetUserId);
+    targetUser.followers.pull(currentUserId);
+    await targetUser.save();
+  }
+
+  await currentUser.save();
+  res.status(200).json({
+    status: "success",
+    data: {
+      blocked: !isBlocked,
+    },
+  });
+});
+
+export const getBlockedUsers = catchAsync(async (req, res, next) => {
+  const currentUser = await User.findById(req.user.id).populate(
+    "blockedUsers",
+    "fullName profileImage"
+  );
+
+  res.status(200).json({
+    status: "success",
+    results: currentUser.blockedUsers.length,
+    data: {
+      blockedUsers: currentUser.blockedUsers,
     },
   });
 });
