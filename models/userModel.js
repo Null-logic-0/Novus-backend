@@ -24,12 +24,14 @@ const userSchema = new mongoose.Schema(
     },
     passwordConfirm: {
       type: String,
-      required: [true, "Please confirm your password!"],
+      required: function () {
+        return this.isNew || this.isModified("password");
+      },
       validate: {
         validator: function (el) {
-          return el === this.password;
+          return !this.isModified("password") || el === this.password;
         },
-        message: "Provided password does not match.Please repeat password!",
+        message: "Provided password does not match. Please repeat password!",
       },
     },
     profileImage: {
@@ -41,8 +43,20 @@ const userSchema = new mongoose.Schema(
       maxlength: 80,
       default: "",
     },
-    followers: [],
-    following: [],
+    followers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
 
     role: {
       type: String,
@@ -80,6 +94,7 @@ userSchema.pre("save", async function (next) {
 
 userSchema.pre(/^find/, function (next) {
   this.find({ active: true });
+
   next();
 });
 
