@@ -111,3 +111,82 @@ export const toggleFollow = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+export const getFollowingUsers = catchAsync(async (req, res, next) => {
+  const currentUserId = req.user.id;
+
+  const currentUser = await User.findById(currentUserId).populate({
+    path: "following",
+  });
+
+  if (!currentUser) {
+    return next(new AppError("User not found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: currentUser.following.length,
+    data: {
+      following: currentUser.following,
+    },
+  });
+});
+
+export const getFollowersUsers = catchAsync(async (req, res, next) => {
+  const currentUserId = req.user.id;
+
+  // Find users whose "following" array includes the current user
+  const followers = await User.find({
+    following: currentUserId,
+  }).select("fullName profileImage");
+  if (!followers || followers.length === 0) {
+    return next(new AppError("No followers found", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: followers.length,
+    data: {
+      followers,
+    },
+  });
+});
+
+// Users-search
+
+export const searchConnections = catchAsync(async (req, res, next) => {
+  const { query, type } = req.query;
+  const currentUserId = req.user.id;
+
+  if (!query || query.trim() === "") {
+    return res.status(400).json({
+      status: "fail",
+      message: "Search query cannot be empty",
+    });
+  }
+
+  let filter = {
+    fullName: { $regex: query, $options: "i" },
+  };
+
+  if (type === "following") {
+    const currentUser = await User.findById(currentUserId).select("following");
+    filter._id = { $in: currentUser.following };
+  } else if (type === "followers") {
+    const followers = await User.find({ following: currentUserId }).select(
+      "_id"
+    );
+    const followerIds = followers.map((user) => user._id);
+    filter._id = { $in: followerIds };
+  }
+
+  const users = await User.find(filter).select("fullName profileImage");
+
+  res.status(200).json({
+    status: "success",
+    results: users.length,
+    data: {
+      users,
+    },
+  });
+});
