@@ -9,11 +9,13 @@ import {
 import {
   deleteMe,
   getAllUsers,
+  getBlockedUsers,
   getFollowersUsers,
   getFollowingUsers,
   getMe,
   getOneUser,
   searchConnections,
+  toggleBlockUser,
   toggleFollow,
   updateMe,
 } from "../controllers/userControllers.js";
@@ -35,11 +37,18 @@ router.get("/following", getFollowingUsers);
 
 // Route to get followers of the current user
 router.get("/followers", getFollowersUsers);
+
 // Search-user
 router.get("/search/connections", searchConnections);
+
+// Get blocked users
+router.get("/blocked-users", getBlockedUsers);
 
 router.route("/").get(getAllUsers);
 router.route("/:id").get(getOneUser);
 
 // Follow-unfollow route
 router.route("/follow/:id").patch(toggleFollow);
+
+// Block/unblock
+router.patch("/block/:id", toggleBlockUser);

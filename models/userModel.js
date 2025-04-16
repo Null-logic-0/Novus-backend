@@ -68,6 +68,13 @@ const userSchema = new mongoose.Schema(
       default: true,
       select: false,
     },
+    blockedUsers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
+      },
+    ],
     passwordChangedAt: Date,
   },
   {
