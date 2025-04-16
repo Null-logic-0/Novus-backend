@@ -20,8 +20,9 @@ const commentSchema = new mongoose.Schema(
     },
     likes: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: "User",
+        default: [],
       },
     ],
     depth: {
@@ -57,6 +58,14 @@ commentSchema.virtual("replies", {
 commentSchema.pre(/^find/, function (next) {
   this.populate({
     path: "user",
+    select: "fullName profileImage",
+  });
+  next();
+});
+
+commentSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "likes",
     select: "fullName profileImage",
   });
   next();

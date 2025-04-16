@@ -16,10 +16,11 @@ const postSchema = new mongoose.Schema(
       maxlength: 2200,
       minlength: 3,
     },
-    like: [
+    likes: [
       {
-        type: mongoose.Schema.Types.ObjectId,
+        type: [mongoose.Schema.Types.ObjectId],
         ref: "User",
+        default: [],
       },
     ],
   },
@@ -39,6 +40,14 @@ const postSchema = new mongoose.Schema(
 postSchema.pre(/^find/, function (next) {
   this.populate({
     path: "user",
+    select: "fullName profileImage",
+  });
+  next();
+});
+
+postSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "likes",
     select: "fullName profileImage",
   });
   next();

@@ -1,6 +1,7 @@
 import Comment from "../models/commentModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
+import { toggleLike } from "../utils/toggleLike.js";
 
 function buildCommentTree(comments, parentId = null, depth = 0) {
   const tree = [];
@@ -106,3 +107,7 @@ export const deleteComment = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+// Likes
+
+export const toggleLikeComment = toggleLike(Comment);
