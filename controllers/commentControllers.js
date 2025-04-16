@@ -109,5 +109,4 @@ export const deleteComment = catchAsync(async (req, res, next) => {
 });
 
 // Likes
-
 export const toggleLikeComment = toggleLike(Comment);

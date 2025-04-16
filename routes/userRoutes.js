@@ -11,6 +11,7 @@ import {
   getAllUsers,
   getMe,
   getOneUser,
+  toggleFollow,
   updateMe,
 } from "../controllers/userControllers.js";
 
@@ -28,3 +29,6 @@ router.delete("/deleteMe", deleteMe);
 
 router.route("/").get(getAllUsers);
 router.route("/:id").get(getOneUser);
+
+// Follow-unfollow route
+router.route("/follow/:id").patch(toggleFollow);
