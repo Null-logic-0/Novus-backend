@@ -1,6 +1,9 @@
 import dotenv from "dotenv";
 dotenv.config({ path: "./.env" });
 
+import path, { dirname } from "path";
+import { fileURLToPath } from "url";
+
 import express from "express";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
@@ -20,8 +23,14 @@ import AppError from "./utils/appError.js";
 const app = express();
 
 //Set security HTTP headers
-app.use(cors());
+app.use(/.*/, cors());
 app.use(helmet());
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+app.set("view engine", "pug");
+app.set("views", path.join(__dirname, "views"));
 
 // Development logging
 if (process.env.NODE_ENV === "development") {
