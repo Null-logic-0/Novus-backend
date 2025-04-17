@@ -6,11 +6,7 @@ const postSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
-    media: [
-      {
-        url: { type: String },
-      },
-    ],
+    media: [String],
     caption: {
       type: String,
       maxlength: 2200,
