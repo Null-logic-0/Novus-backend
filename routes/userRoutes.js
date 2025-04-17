@@ -1,7 +1,9 @@
 import { Router } from "express";
 import {
+  forgotPassword,
   login,
   protect,
+  resetPassword,
   restrictTo,
   signup,
   updatePassword,
@@ -25,6 +27,9 @@ export const router = Router();
 
 router.post("/signup", signup);
 router.post("/login", login);
+
+router.post("/forgotPassword", forgotPassword);
+router.patch("/resetPassword/:token", resetPassword);
 
 router.use(protect);
 
