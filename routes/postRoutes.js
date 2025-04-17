@@ -8,6 +8,7 @@ import {
   getSinglePost,
   togglePostLike,
   updatePost,
+  uploadMedia,
 } from "../controllers/PostControllers.js";
 import {
   commentReply,
@@ -22,12 +23,16 @@ export const router = Router();
 
 router.use(protect);
 // Posts
-router.route("/").get(getAllPosts).post(createPost);
+router.route("/").get(getAllPosts).post(uploadMedia, createPost);
 
 // Liked-posts
 router.get("/liked-posts", getLikedPosts);
 
-router.route("/:id").get(getSinglePost).patch(updatePost).delete(deletePost);
+router
+  .route("/:id")
+  .get(getSinglePost)
+  .patch(uploadMedia, updatePost)
+  .delete(deletePost);
 
 // Comments
 router.route("/:id/comments").get(getPostComments).post(createComment);
