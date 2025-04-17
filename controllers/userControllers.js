@@ -1,7 +1,41 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
+import multer from "multer";
+import multerS3 from "multer-s3";
+import s3 from "../utils/s3Config.js";
+
 import User from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
 import { isBlocked } from "../utils/isBlocked.js";
+
+const multerStorage = multerS3({
+  s3,
+  bucket: process.env.AWS_BUCKET_NAME,
+  metadata: (req, file, cb) => {
+    cb(null, { fieldname: file.fieldname });
+  },
+  key: (req, file, cb) => {
+    const ext = file.mimetype.split("/")[1];
+    const fileName = `user-${req.user.id}-${Date.now()}.${ext}`;
+    cb(null, `media/user-profiles/${req.user.email}/${fileName}`);
+  },
+});
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image! Please upload only images.", 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+export const uploadUserPhoto = upload.single("profileImage");
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -12,6 +46,7 @@ const filterObj = (obj, ...allowedFields) => {
   });
   return newObj;
 };
+
 export const getAllUsers = catchAsync(async (req, res, next) => {
   const currentUser = await User.findById(req.user.id).select("blockedUsers");
 
@@ -60,6 +95,7 @@ export const updateMe = catchAsync(async (req, res, next) => {
   }
 
   const filteredBody = filterObj(req.body, "fullName", "bio");
+  if (req.file) filteredBody.profileImage = req.file.filename;
 
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
