@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config({ path: "./.env" });
+
 import express from "express";
 import morgan from "morgan";
 import rateLimit from "express-rate-limit";
@@ -14,9 +17,6 @@ import { router as postRouter } from "./routes/postRoutes.js";
 import { globalErrorHandler } from "./controllers/errorController.js";
 import AppError from "./utils/appError.js";
 
-import dotenv from "dotenv";
-dotenv.config({ path: "./config.env" });
-
 const app = express();
 
 //Set security HTTP headers
@@ -26,8 +26,8 @@ app.use(helmet());
 // Development logging
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
+  console.log(`App is on ${process.env.NODE_ENV} mode`);
 }
-
 // Limit requests from same API
 const limiter = rateLimit({
   max: 100,

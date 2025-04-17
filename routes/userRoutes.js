@@ -18,6 +18,7 @@ import {
   toggleBlockUser,
   toggleFollow,
   updateMe,
+  uploadUserPhoto,
 } from "../controllers/userControllers.js";
 
 export const router = Router();
@@ -29,7 +30,7 @@ router.use(protect);
 
 router.get("/me", getMe, getOneUser);
 router.patch("/updateMyPassword", updatePassword);
-router.patch("/updateMe", updateMe);
+router.patch("/updateMe", uploadUserPhoto, updateMe);
 router.delete("/deleteMe", deleteMe);
 
 // Route to get following users
