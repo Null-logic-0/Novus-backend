@@ -9,8 +9,8 @@ const postSchema = new mongoose.Schema(
     media: [String],
     caption: {
       type: String,
-      maxlength: 2200,
-      minlength: 3,
+      minlength: [3, "Caption must be at least 3 characters"],
+      maxlength: [2200, "Caption must be less than 2200 characters"],
     },
     likes: [
       {

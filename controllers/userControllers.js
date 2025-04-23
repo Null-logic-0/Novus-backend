@@ -94,8 +94,13 @@ export const updateMe = catchAsync(async (req, res, next) => {
     return next(new AppError("This route is not for password updates.", 400));
   }
 
-  const filteredBody = filterObj(req.body, "fullName", "bio");
-  if (req.file) filteredBody.profileImage = req.file.filename;
+  const filteredBody = filterObj(req.body, "fullName", "profileImage", "bio");
+  if (req.file) filteredBody.profileImage = req.file.key;
+
+  if (req.file) {
+    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${req.file.key}`;
+    filteredBody.profileImage = imageUrl; // Save the full URL
+  }
 
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
