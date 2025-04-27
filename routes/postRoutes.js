@@ -15,6 +15,7 @@ import {
   createComment,
   deleteComment,
   getPostComments,
+  getSingleComment,
   toggleLikeComment,
   updateComment,
 } from "../controllers/commentControllers.js";
@@ -39,7 +40,11 @@ router.route("/:id/comments").get(getPostComments).post(createComment);
 
 // Comment reply nested route
 router.route("/:id/comments/:parentCommentId/replies").post(commentReply);
-router.route("/comments/:id").patch(updateComment).delete(deleteComment);
+router
+  .route("/comments/:id")
+  .get(getSingleComment)
+  .patch(updateComment)
+  .delete(deleteComment);
 
 // Post like
 router.route("/:id/like").patch(togglePostLike);

@@ -50,9 +50,9 @@ const multerFilter = (req, file, cb) => {
 const upload = multer({
   storage: multerStorage,
   fileFilter: multerFilter,
-  limits: {
-    fileSize: 150 * 1024 * 1024,
-  },
+  // limits: {
+  //   fileSize: 150 * 1024 * 1024,
+  // },
 });
 
 export const uploadMedia = upload.array("media", 5);
@@ -68,8 +68,7 @@ export const currentLoggedinUser = async (req, next) => {
 };
 
 export const getAllPosts = catchAsync(async (req, res, next) => {
-  const posts = await Post.find();
-
+  const posts = await Post.find().sort({ createdAt: -1 });
   res.status(200).json({
     status: "success",
     results: posts.length,

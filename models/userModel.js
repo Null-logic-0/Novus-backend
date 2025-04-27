@@ -119,6 +119,8 @@ userSchema.virtual("postsVirtual", {
   ref: "Post",
   foreignField: "user",
   localField: "_id",
+  justOne: false,
+  options: { sort: { createdAt: -1 } },
 });
 
 userSchema.methods.correctPassword = async function (

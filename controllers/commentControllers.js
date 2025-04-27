@@ -19,9 +19,10 @@ function buildCommentTree(comments, parentId = null, depth = 0) {
 export const getPostComments = catchAsync(async (req, res, next) => {
   const comments = await Comment.find({ post: req.params.id })
     .populate("user", "fullName profileImage")
-    .lean(); // now you're working with plain JS objects
+    .lean()
+    .sort({ createdAt: -1 });
 
-  const commentTree = buildCommentTree(comments); // recursive nesting
+  const commentTree = buildCommentTree(comments);
 
   res.status(200).json({
     status: "success",
@@ -32,12 +33,28 @@ export const getPostComments = catchAsync(async (req, res, next) => {
   });
 });
 
+export const getSingleComment = catchAsync(async (req, res, next) => {
+  const comment = await Comment.findById(req.params.id);
+
+  if (!comment) {
+    return next(new AppError("No comment found with this ID."));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      comment,
+    },
+  });
+});
+
 export const createComment = catchAsync(async (req, res, next) => {
   let depth = 0;
+
   if (req.body.parentComment) {
     const parent = await Comment.findById(req.body.parentComment);
     if (!parent) {
-      return next(new AppError("parent comment not found", 404));
+      return next(new AppError("Parent comment not found", 404));
     }
     depth = parent.depth + 1;
   }
@@ -46,6 +63,8 @@ export const createComment = catchAsync(async (req, res, next) => {
     text: req.body.text,
     post: req.params.id,
     user: req.user.id,
+    parentComment: req.body.parentComment || null,
+    depth,
   });
 
   res.status(201).json({

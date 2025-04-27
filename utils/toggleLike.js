@@ -25,8 +25,8 @@ export const toggleLike = (Model) => {
 
     res.status(200).json({
       status: "success",
-      totalLikes: doc.likes.length,
       data: {
+        totalLikes: doc.likes.length,
         liked: !hasLiked,
       },
     });
