@@ -50,7 +50,10 @@ const filterObj = (obj, ...allowedFields) => {
 export const getAllUsers = catchAsync(async (req, res, next) => {
   const currentUser = await User.findById(req.user.id).select("blockedUsers");
 
-  const users = await User.find().populate("postsVirtual");
+  const users = await User.find()
+    .populate("postsVirtual")
+    .populate("followers", "fullName profileImage")
+    .populate("following", "fullName profileImage");
 
   const visibleUsers = users.filter(
     (user) => !isBlocked(currentUser, user._id)
@@ -172,35 +175,31 @@ export const toggleFollow = catchAsync(async (req, res, next) => {
 });
 
 export const getFollowingUsers = catchAsync(async (req, res, next) => {
-  const currentUserId = req.user.id;
+  const userId = req.params.id;
 
-  const currentUser = await User.findById(currentUserId).populate({
+  const user = await User.findById(userId).populate({
     path: "following",
   });
 
-  if (!currentUser) {
+  if (!user) {
     return next(new AppError("User not found", 404));
   }
 
   res.status(200).json({
     status: "success",
-    results: currentUser.following.length,
+    results: user.following.length,
     data: {
-      following: currentUser.following,
+      following: user.following,
     },
   });
 });
 
 export const getFollowersUsers = catchAsync(async (req, res, next) => {
-  const currentUserId = req.user.id;
+  const userId = req.params.id;
 
-  // Find users whose "following" array includes the current user
   const followers = await User.find({
-    following: currentUserId,
+    following: userId,
   }).select("fullName profileImage");
-  if (!followers || followers.length === 0) {
-    return next(new AppError("No followers found", 404));
-  }
 
   res.status(200).json({
     status: "success",

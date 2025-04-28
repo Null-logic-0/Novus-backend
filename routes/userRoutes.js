@@ -41,10 +41,10 @@ router.patch("/updateMe", uploadUserPhoto, updateMe);
 router.delete("/deleteMe", deleteMe);
 
 // Route to get following users
-router.get("/following", getFollowingUsers);
+router.get("/following/:id", getFollowingUsers);
 
 // Route to get followers of the current user
-router.get("/followers", getFollowersUsers);
+router.get("/followers/:id", getFollowersUsers);
 
 // Search-user
 router.get("/search/connections", searchConnections);
