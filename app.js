@@ -23,8 +23,6 @@ import AppError from "./utils/appError.js";
 const app = express();
 
 //Set security HTTP headers
-// app.use(cors());
-
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -33,6 +31,7 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(helmet());
 
 const __filename = fileURLToPath(import.meta.url);
