@@ -1,5 +1,3 @@
-import Post from "../models/postModel.js";
-
 export function registerPostHandlers(socket, io) {
   socket.on("new-post", (data) => {
     socket.broadcast.emit("new-post", data);
