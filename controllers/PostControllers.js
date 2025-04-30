@@ -12,12 +12,7 @@ import { toggleLike } from "../utils/toggleLike.js";
 const mimeToExt = {
   "image/jpeg": "jpg",
   "image/png": "png",
-  "image/webp": "webp",
-  "image/gif": "gif",
   "video/mp4": "mp4",
-  "video/quicktime": "mov",
-  "video/x-matroska": "mkv",
-  "video/webm": "webm",
 };
 
 const multerStorage = multerS3({
@@ -41,7 +36,7 @@ const multerFilter = (req, file, cb) => {
     cb(null, true);
   } else {
     cb(
-      new AppError("Only images and videos are allowed to be uploaded.", 400),
+      new AppError("Only .jpg, .jpeg, .png, and .mp4 files are allowed.", 400),
       false
     );
   }

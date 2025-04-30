@@ -55,7 +55,7 @@ const limiter = rateLimit({
 app.use("/api", limiter);
 
 // Body parsing middleware
-app.use(express.json({ limit: "70kb" }));
+app.use(express.json({ limit: "150kb" }));
 
 // Data sanitization againt NOSQL query injection
 app.use((req, res, next) => {
