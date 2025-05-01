@@ -8,6 +8,7 @@ import User from "../models/userModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
 import { isBlocked } from "../utils/isBlocked.js";
+import Activity from "../models/activtyModel.js";
 
 const multerStorage = multerS3({
   s3,
@@ -155,10 +156,22 @@ export const toggleFollow = catchAsync(async (req, res, next) => {
   if (isFollowing) {
     currentUser.following.pull(targetUserId);
     targetUser.followers.pull(currentUserId);
+
+    await Activity.deleteOne({
+      type: "follow",
+      fromUser: currentUserId,
+      toUser: targetUserId,
+    });
   } else {
     // If not following, follow
     currentUser.following.push(targetUserId);
     targetUser.followers.push(currentUserId);
+
+    await Activity.create({
+      type: "follow",
+      fromUser: currentUserId,
+      toUser: targetUserId,
+    });
   }
 
   await currentUser.save();
