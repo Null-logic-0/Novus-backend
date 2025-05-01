@@ -8,6 +8,7 @@ import Post from "../models/postModel.js";
 import AppError from "../utils/appError.js";
 import catchAsync from "../utils/catchAsync.js";
 import { toggleLike } from "../utils/toggleLike.js";
+import User from "../models/userModel.js";
 
 const mimeToExt = {
   "image/jpeg": "jpg",
@@ -62,8 +63,35 @@ export const currentLoggedinUser = async (req, next) => {
   return post;
 };
 
+// export const getAllPosts = catchAsync(async (req, res, next) => {
+//   const posts = await Post.find().sort({ createdAt: -1 });
+//   res.status(200).json({
+//     status: "success",
+//     results: posts.length,
+//     data: {
+//       posts,
+//     },
+//   });
+// });
+
 export const getAllPosts = catchAsync(async (req, res, next) => {
-  const posts = await Post.find().sort({ createdAt: -1 });
+  const { filter } = req.query;
+  const userId = req.user.id;
+
+  let filterQuery = {};
+
+  if (filter === "likes") {
+    filterQuery = { likes: { $elemMatch: { $in: [[userId]] } } };
+  }
+
+  if (filter === "followings") {
+    const user = await User.findById(userId).select("following");
+    filterQuery = { user: { $in: user.following } };
+  }
+
+  const posts = await Post.find(filterQuery)
+    .sort({ createdAt: -1 })
+    .populate("user", "fullName profileImage");
   res.status(200).json({
     status: "success",
     results: posts.length,
@@ -141,24 +169,3 @@ export const deletePost = catchAsync(async (req, res, next) => {
 
 // Post like
 export const togglePostLike = toggleLike(Post);
-
-export const getLikedPosts = catchAsync(async (req, res, next) => {
-  const currentUserId = req.user.id;
-
-  const likedPosts = await Post.find({ likes: currentUserId }).populate({
-    path: "user",
-    select: "fullName profileImage",
-  });
-
-  if (!likedPosts) {
-    return next(new AppError("No liked posts found", 404));
-  }
-
-  res.status(200).json({
-    status: "success",
-    results: likedPosts.length,
-    data: {
-      likedPosts,
-    },
-  });
-});
