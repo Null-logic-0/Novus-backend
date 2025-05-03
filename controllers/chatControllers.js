@@ -49,8 +49,6 @@ const upload = multer({
 export const uploadMedia = upload.array("media", 5);
 
 export const createChat = catchAsync(async (req, res, next) => {
-  console.log("Request body:", req.body);
-
   let { userIds, isGroupChat, name } = req.body;
 
   if (!userIds || userIds.length < 1) {
