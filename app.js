@@ -18,6 +18,7 @@ import compression from "compression";
 import { router as userRouter } from "./routes/userRoutes.js";
 import { router as postRouter } from "./routes/postRoutes.js";
 import { router as activityRouter } from "./routes/activityRoutes.js";
+import { router as chatRouter } from "./routes/chatRoutes.js";
 import { globalErrorHandler } from "./controllers/errorController.js";
 import AppError from "./utils/appError.js";
 
@@ -106,6 +107,7 @@ app.use((req, res, next) => {
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/posts", postRouter);
 app.use("/api/v1/activity", activityRouter);
+app.use("/api/v1/chats", chatRouter);
 
 // Catch-all for undefined routes
 app.all(/.*/, (req, res, next) => {
