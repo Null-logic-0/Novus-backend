@@ -108,11 +108,57 @@ export const getUserChats = catchAsync(async (req, res) => {
     .populate("lastMessage")
     .sort({ updatedAt: -1 });
 
+  const modifiedChats = chats.map((chat) => {
+    const otherUser = chat.users.find(
+      (user) => user._id.toString() !== req.user._id.toString()
+    );
+
+    return {
+      _id: chat._id,
+      isGroupChat: chat.isGroupChat,
+      otherUser,
+      lastMessage: chat.lastMessage,
+      createdAt: chat.createdAt,
+      updatedAt: chat.updatedAt,
+    };
+  });
+
   res.status(200).json({
     status: "success",
-    result: chats.length,
+    result: modifiedChats.length,
     data: {
-      chats,
+      chats: modifiedChats,
+    },
+  });
+});
+
+export const getSingleChat = catchAsync(async (req, res) => {
+  const chat = await Chat.findById(req.params.id).populate(
+    "users",
+    "fullName profileImage"
+  );
+
+  if (!chat) {
+    return res.status(404).json({
+      status: "fail",
+      message: "Chat not found",
+    });
+  }
+
+  const otherUser = chat.users.find(
+    (user) => user._id.toString() !== req.user._id.toString()
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      chat: {
+        _id: chat._id,
+        isGroupChat: chat.isGroupChat,
+        otherUser,
+        createdAt: chat.createdAt,
+        updatedAt: chat.updatedAt,
+      },
     },
   });
 });
