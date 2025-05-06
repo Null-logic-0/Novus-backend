@@ -25,11 +25,18 @@ import AppError from "./utils/appError.js";
 const app = express();
 
 //Set security HTTP headers
+// app.use(
+//   cors({
+//     origin: (origin, callback) => {
+//       callback(null, origin);
+//     },
+//     credentials: true,
+//   })
+// );
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      callback(null, origin);
-    },
+    origin: "https://novus-frontend-rho.vercel.app",
     credentials: true,
   })
 );
