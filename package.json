@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch  server.js",
-    "start": "NODE_ENV=production node --watch server.js"
+    "start": "node server.js"
   },
   "author": "Luka Tchelidze",
   "license": "ISC",
