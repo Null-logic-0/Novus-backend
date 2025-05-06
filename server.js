@@ -9,7 +9,7 @@ const server = createServer(app);
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "http://localhost:3000",
+  "http://localhost:4173",
   "https://novus-frontend-rho.vercel.app",
 ];
 const io = new Server(server, {

@@ -26,9 +26,9 @@ const app = express();
 
 //Set security HTTP headers
 const allowedOrigins = [
-  "https://novus-frontend-rho.vercel.app",
-  "http://localhost:5173",
-  "http://localhost:4173",
+  "http://localhost:5173/api/v1",
+  "https://novus-frontend-rho.vercel.app/api/v1",
+  "http://localhost:417/api/v1",
 ];
 
 app.use(
