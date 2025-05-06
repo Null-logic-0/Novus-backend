@@ -6,10 +6,20 @@ import app from "./app.js";
 import registerSocketHandlers from "./sockets/index.js";
 
 const server = createServer(app);
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://novus-frontend-rho.vercel.app",
+];
 const io = new Server(server, {
   cors: {
-    origin: (origin, callback) => {
-      callback(null, origin);
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
     },
     credentials: true,
   },
