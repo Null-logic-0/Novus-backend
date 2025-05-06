@@ -25,7 +25,11 @@ import AppError from "./utils/appError.js";
 const app = express();
 
 //Set security HTTP headers
-const allowedOrigins = ["https://novus-frontend-rho.vercel.app"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:4173",
+  "https://novus-frontend-rho.vercel.app",
+];
 
 app.use(
   cors({
