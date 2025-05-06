@@ -25,21 +25,22 @@ import AppError from "./utils/appError.js";
 const app = express();
 
 //Set security HTTP headers
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       callback(null, origin);
-//     },
-//     credentials: true,
-//   })
-// );
+const allowedOrigins = ["https://novus-frontend-rho.vercel.app"];
 
 app.use(
   cors({
-    origin: "https://novus-frontend-rho.vercel.app",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
+app.options(/.*/, cors());
 
 app.use(helmet());
 
