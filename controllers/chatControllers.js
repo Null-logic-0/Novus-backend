@@ -183,6 +183,9 @@ export const sendMessage = catchAsync(async (req, res) => {
     .populate("sender", "fullName profileImage")
     .populate("chat");
 
+  const io = req.app.get("io");
+  io.to(chatId).emit("new-message", fullMessage);
+
   res.status(201).json({
     status: "success",
     data: {

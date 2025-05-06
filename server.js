@@ -14,6 +14,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+app.set("io", io);
 
 const DB = process.env.DATABASE;
 const port = process.env.PORT || 3000;
