@@ -9,7 +9,8 @@ import {
   togglePostLike,
   updatePost,
   uploadMedia,
-} from "../controllers/PostControllers.js";
+} from "../controllers/postController.js";
+
 import {
   commentReply,
   createComment,
