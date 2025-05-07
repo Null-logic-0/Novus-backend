@@ -8,9 +8,11 @@ import registerSocketHandlers from "./sockets/index.js";
 const server = createServer(app);
 
 const allowedOrigins = [
+  "https://novus-three.vercel.app",
+  "novus-git-main-null-logic-0s-projects.vercel.app",
+  "novus-hn1gxqh7l-null-logic-0s-projects.vercel.app",
   "http://localhost:5173",
   "http://localhost:4173",
-  "https://novus-frontend-rho.vercel.app",
 ];
 const io = new Server(server, {
   cors: {
