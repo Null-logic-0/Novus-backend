@@ -4,7 +4,7 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "dev": "node --watch  server.js",
+    "dev": "node --watch --env-file=.env server.js",
     "start": "node server.js"
   },
   "author": "Luka Tchelidze",
