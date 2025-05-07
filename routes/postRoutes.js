@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { protect } from "../controllers/authControllers.js";
+
 import {
   createPost,
   deletePost,
@@ -8,7 +9,7 @@ import {
   togglePostLike,
   updatePost,
   uploadMedia,
-} from "../controllers/postControllers.js";
+} from "../controllers/PostControllers.js";
 import {
   commentReply,
   createComment,
